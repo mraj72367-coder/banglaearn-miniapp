@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
   <title>Bangla Earn Mini App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     body{
       font-family: Arial, sans-serif;
@@ -30,6 +32,12 @@
       cursor:pointer;
       margin-top:15px;
     }
+    #msg{
+      margin-top:15px;
+      color:green;
+      font-weight:bold;
+      display:none;
+    }
   </style>
 </head>
 <body>
@@ -37,8 +45,17 @@
   <div class="box">
     <h1>Bangla Earn</h1>
     <p>Mini App সফলভাবে চালু হয়েছে ✅</p>
-    <button>Earn Now</button>
+
+    <button onclick="earnNow()">Earn Now</button>
+
+    <div id="msg">🎉 Earn system খুব শিগগিরই চালু হবে!</div>
   </div>
 
+  <script>
+    function earnNow(){
+      document.getElementById("msg").style.display = "block";
+    }
+  </script>
+
 </body>
-  </html>
+</html>
