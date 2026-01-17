@@ -7,17 +7,19 @@
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
-body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; text-align:center;}
-h1,h2 { color: #00a2ff; margin:10px 0; }
-p { color: #333; font-size: 16px; }
-button { padding:10px 20px; font-size:16px; margin:10px; border:none; border-radius:8px; cursor:pointer; background:#00a2ff; color:#fff;}
+body { font-family: Arial, sans-serif; margin:0; padding:0; text-align:center; background:#f9f9f9;}
+h1,h2 { color:#00a2ff; margin:10px 0;}
+p,span { font-size:16px; color:#333;}
+button { padding:10px 20px; margin:5px; font-size:16px; border:none; border-radius:8px; cursor:pointer; background:#00a2ff; color:#fff;}
 button:hover { background:#0081cc;}
-#timer { font-size:18px; color:#ff5722; margin:10px;}
-nav { position: fixed; bottom:0; width:100%; background:#eee; display:flex; justify-content:space-around; padding:5px 0; }
+.page { display:none; padding-bottom:60px;}
+.active { display:block;}
+nav { position:fixed; bottom:0; width:100%; background:#eee; display:flex; justify-content:space-around; padding:5px 0;}
 nav button { flex:1; margin:0; border-radius:0;}
-.page { display:none; padding-bottom:60px; } /* space for nav */
-.active { display:block; }
-input { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid #ccc;}
+input, select { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid #ccc;}
+#timer { font-size:18px; color:#ff5722; margin:10px;}
+ul { list-style:none; padding:0;}
+li { text-align:left; margin:5px 20px;}
 </style>
 </head>
 <body>
@@ -39,11 +41,26 @@ input { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid 
 <div id="page-home" class="page">
 <h1>Bangla Earn Home</h1>
 <p>আজকের এড দেখা হয়েছে: <span id="adsCount">0</span>/100</p>
-<button id="goEarn">এড দেখো</button>
-<div id="timer"></div>
+<button id="goEarn">Earn Page</button>
 </div>
 
-<!-- Page 3: Team / Referral -->
+<!-- Page 3: Earn -->
+<div id="page-earn" class="page">
+<h1>Earn Page</h1>
+<p>এড দেখো (1 টাকা / ad)</p>
+<button id="adBtn">এড দেখো</button>
+<div id="timer"></div>
+
+<p>Daily Check-in</p>
+<button id="checkinBtn">Check-in</button>
+<p id="checkinMsg"></p>
+
+<p>Daily Task</p>
+<button id="taskBtn">Task Complete (10 টাকা)</button>
+<p id="taskMsg"></p>
+</div>
+
+<!-- Page 4: Team / Referral -->
 <div id="page-team" class="page">
 <h1>Team / Referral</h1>
 <p>তোমার রেফারাল লিংক: <span id="refLink">USER123</span> <button onclick="copyReferral()">Copy</button></p>
@@ -53,7 +70,7 @@ input { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid 
 <p>2nd Generation Commission: <span id="gen2">0</span> টাকা</p>
 </div>
 
-<!-- Page 4: Withdraw -->
+<!-- Page 5: Withdraw -->
 <div id="page-withdraw" class="page">
 <h1>Withdraw</h1>
 <p>Min: 130, Max: 1010 টাকা</p>
@@ -64,7 +81,7 @@ input { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid 
 <p id="withdrawMsg"></p>
 </div>
 
-<!-- Page 5: History -->
+<!-- Page 6: History -->
 <div id="page-history" class="page">
 <h1>History</h1>
 <h2>Earnings</h2>
@@ -73,7 +90,7 @@ input { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid 
 <ul id="withdrawHistory"></ul>
 </div>
 
-<!-- Page 6: Profile -->
+<!-- Page 7: Profile -->
 <div id="page-profile" class="page">
 <h1>Profile</h1>
 <p>Name: <span id="profName"></span></p>
@@ -86,7 +103,7 @@ input { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid 
 <!-- Navigation -->
 <nav>
 <button onclick="showPage('page-home')">Home</button>
-<button onclick="showPage('page-register')">Register</button>
+<button onclick="showPage('page-earn')">Earn</button>
 <button onclick="showPage('page-team')">Team</button>
 <button onclick="showPage('page-withdraw')">Withdraw</button>
 <button onclick="showPage('page-history')">History</button>
@@ -95,17 +112,17 @@ input { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid 
 
 <script>
 // ----- Page Navigation -----
-function showPage(pageId) {
+function showPage(pageId){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
 }
 
 // ----- Registration -----
 document.getElementById('registerBtn').addEventListener('click',()=>{
-    let name = document.getElementById('regName').value;
-    let mobile = document.getElementById('regMobile').value;
-    let method = document.getElementById('regPayment').value;
-    let acc = document.getElementById('regAcc').value;
+    let name=document.getElementById('regName').value;
+    let mobile=document.getElementById('regMobile').value;
+    let method=document.getElementById('regPayment').value;
+    let acc=document.getElementById('regAcc').value;
     if(!name||!mobile||!acc){ alert('সব ফিল্ড পূরণ করো'); return; }
     localStorage.setItem('userName',name);
     localStorage.setItem('userMobile',mobile);
@@ -119,93 +136,114 @@ document.getElementById('registerBtn').addEventListener('click',()=>{
 
 // ----- Profile Update -----
 function updateProfile(){
-    document.getElementById('profName').innerText = localStorage.getItem('userName') || '';
-    document.getElementById('profMobile').innerText = localStorage.getItem('userMobile') || '';
-    document.getElementById('profMethod').innerText = localStorage.getItem('userMethod') || '';
-    document.getElementById('profAcc').innerText = localStorage.getItem('userAcc') || '';
-    document.getElementById('profDate').innerText = localStorage.getItem('regDate') || '';
-    document.getElementById('payMethod').innerText = localStorage.getItem('userMethod') || '';
-    document.getElementById('payAcc').innerText = localStorage.getItem('userAcc') || '';
+    document.getElementById('profName').innerText=localStorage.getItem('userName')||'';
+    document.getElementById('profMobile').innerText=localStorage.getItem('userMobile')||'';
+    document.getElementById('profMethod').innerText=localStorage.getItem('userMethod')||'';
+    document.getElementById('profAcc').innerText=localStorage.getItem('userAcc')||'';
+    document.getElementById('profDate').innerText=localStorage.getItem('regDate')||'';
+    document.getElementById('payMethod').innerText=localStorage.getItem('userMethod')||'';
+    document.getElementById('payAcc').innerText=localStorage.getItem('userAcc')||'';
 }
 
-// ----- Earn Page -----
-const maxAdsPerDay = 100;
-const today = new Date().toISOString().slice(0,10);
-let adsToday = JSON.parse(localStorage.getItem("ads_" + today)) || 0;
-document.getElementById('adsCount').innerText = adsToday;
+// ----- Earn Page Logic -----
+// Ads
+const maxAdsPerDay=100;
+const today=new Date().toISOString().slice(0,10);
+let adsToday=JSON.parse(localStorage.getItem("ads_"+today))||0;
+document.getElementById('adsCount').innerText=adsToday;
 
-document.getElementById('goEarn').addEventListener('click',function(){
-    if(adsToday>=maxAdsPerDay){ alert("আজকের 100 এড limit শেষ!"); return;}
-    const adLink = "https://otieu.com/4/10476658"; // Monetag / SmartLink
+document.getElementById('adBtn').addEventListener('click',()=>{
+    if(adsToday>=maxAdsPerDay){ alert("আজকের 100 এড limit শেষ!"); return; }
+    const adLink="https://otieu.com/4/10476658";
     window.open(adLink,"_blank");
-
-    // 15 sec timer
-    let timeLeft = 15;
-    const timerDiv = document.getElementById("timer");
-    timerDiv.innerText = "⏳ "+timeLeft+" সেকেন্ড অপেক্ষা করো...";
-    document.getElementById('goEarn').disabled = true;
-
-    const countdown = setInterval(()=>{
+    let timeLeft=15;
+    const timerDiv=document.getElementById("timer");
+    timerDiv.innerText="⏳ "+timeLeft+" সেকেন্ড অপেক্ষা করো...";
+    document.getElementById('adBtn').disabled=true;
+    const countdown=setInterval(()=>{
         timeLeft--;
-        timerDiv.innerText = "⏳ "+timeLeft+" সেকেন্ড অপেক্ষা করো...";
+        timerDiv.innerText="⏳ "+timeLeft+" সেকেন্ড অপেক্ষা করো...";
         if(timeLeft<=0){
             clearInterval(countdown);
             timerDiv.innerText="";
-            document.getElementById('goEarn').disabled=false;
+            document.getElementById('adBtn').disabled=false;
             adsToday++;
             localStorage.setItem("ads_"+today,JSON.stringify(adsToday));
             document.getElementById('adsCount').innerText=adsToday;
-            alert(`Ad complete! +1 টাকা balance-এ যোগ হয়েছে। আজকে ${adsToday}/100 এড দেখা হয়েছে।`);
-            // Update earn history
-            let earnHist = JSON.parse(localStorage.getItem('earnHistory')||'[]');
+            alert(`Ad complete! +1 টাকা balance-এ যোগ হয়েছে।`);
+            let earnHist=JSON.parse(localStorage.getItem('earnHistory')||'[]');
             earnHist.push({date:new Date().toLocaleString(),amount:1});
             localStorage.setItem('earnHistory',JSON.stringify(earnHist));
         }
     },1000);
 });
 
+// Daily Check-in
+document.getElementById('checkinBtn').addEventListener('click',()=>{
+    const checkinKey="checkin_"+today;
+    if(localStorage.getItem(checkinKey)){ alert("আজকে check-in করা হয়ে গেছে!"); return;}
+    let dayCount = Number(localStorage.getItem("checkinDay")||0)+1;
+    let reward = dayCount; // 1st day=1, 2nd day=2
+    let earnHist=JSON.parse(localStorage.getItem('earnHistory')||'[]');
+    earnHist.push({date:new Date().toLocaleString(),amount:reward});
+    localStorage.setItem('earnHistory',JSON.stringify(earnHist));
+    localStorage.setItem(checkinKey,true);
+    localStorage.setItem("checkinDay",dayCount);
+    alert(`Check-in Complete! +${reward} টাকা`);
+    document.getElementById('checkinMsg').innerText=`আজকের check-in করা হয়েছে। (+${reward} টাকা)`;
+});
+
+// Daily Task
+document.getElementById('taskBtn').addEventListener('click',()=>{
+    const taskKey="task_"+today;
+    if(localStorage.getItem(taskKey)){ alert("আজকের task করা হয়ে গেছে!"); return;}
+    let earnHist=JSON.parse(localStorage.getItem('earnHistory')||'[]');
+    earnHist.push({date:new Date().toLocaleString(),amount:10});
+    localStorage.setItem('earnHistory',JSON.stringify(earnHist));
+    localStorage.setItem(taskKey,true);
+    alert("Daily Task Complete! +10 টাকা");
+    document.getElementById('taskMsg').innerText="আজকের Daily Task সম্পন্ন হয়েছে (+10 টাকা)";
+});
+
 // ----- Team / Referral -----
-const referralCode = "USER123";
+const referralCode="USER123";
 document.getElementById('refLink').innerText=referralCode;
 function copyReferral(){ navigator.clipboard.writeText(referralCode); alert("Referral Copied!"); }
-// For demo: total referrals
 document.getElementById('totalRef').innerText=0;
 document.getElementById('refIncome').innerText=0;
 document.getElementById('gen1').innerText=0;
 document.getElementById('gen2').innerText=0;
 
-// ----- Withdraw Page -----
+// ----- Withdraw -----
 document.getElementById('withdrawBtn').addEventListener('click',()=>{
-    let amount = Number(document.getElementById('withdrawAmount').value);
-    if(amount<130){ alert("Minimum withdraw 130 টাকা"); return; }
-    if(amount>1010){ alert("Maximum withdraw 1010 টাকা"); return; }
-    // For demo: simple cooldown 15 sec instead of 15 hr
-    let lastReq = Number(localStorage.getItem('lastWithdraw')||0);
-    let now = Date.now();
-    if(now - lastReq < 15000){ alert("কিছুক্ষণ পর আবার চেষ্টা করো"); return; }
+    let amount=Number(document.getElementById('withdrawAmount').value);
+    if(amount<130){ alert("Minimum withdraw 130 টাকা"); return;}
+    if(amount>1010){ alert("Maximum withdraw 1010 টাকা"); return;}
+    let lastReq=Number(localStorage.getItem('lastWithdraw')||0);
+    let now=Date.now();
+    if(now-lastReq<15000){ alert("কিছুক্ষণ পর আবার চেষ্টা করো"); return; }
     localStorage.setItem('lastWithdraw',now);
-    // Save withdraw history
-    let wHist = JSON.parse(localStorage.getItem('withdrawHistory')||'[]');
+    let wHist=JSON.parse(localStorage.getItem('withdrawHistory')||'[]');
     wHist.push({date:new Date().toLocaleString(),amount:amount});
     localStorage.setItem('withdrawHistory',JSON.stringify(wHist));
-    document.getElementById('withdrawMsg').innerText = "Withdraw Request Sent!";
+    document.getElementById('withdrawMsg').innerText="Withdraw Request Sent!";
 });
 
-// ----- History Page -----
+// ----- History -----
 function updateHistory(){
-    let earnHist = JSON.parse(localStorage.getItem('earnHistory')||'[]');
-    let wHist = JSON.parse(localStorage.getItem('withdrawHistory')||'[]');
-    const eList = document.getElementById('earnHistory');
-    const wList = document.getElementById('withdrawHistory');
+    let earnHist=JSON.parse(localStorage.getItem('earnHistory')||'[]');
+    let wHist=JSON.parse(localStorage.getItem('withdrawHistory')||'[]');
+    const eList=document.getElementById('earnHistory');
+    const wList=document.getElementById('withdrawHistory');
     eList.innerHTML=""; wList.innerHTML="";
-    earnHist.forEach(e=>{ let li=document.createElement('li'); li.innerText=`${e.date} → ${e.amount} টাকা`; eList.appendChild(li);});
-    wHist.forEach(w=>{ let li=document.createElement('li'); li.innerText=`${w.date} → ${w.amount} টাকা`; wList.appendChild(li);});
+    earnHist.forEach(e=>{ let li=document.createElement('li'); li.innerText=`${e.date} → ${e.amount} টাকা`; eList.appendChild(li); });
+    wHist.forEach(w=>{ let li=document.createElement('li'); li.innerText=`${w.date} → ${w.amount} টাকা`; wList.appendChild(li); });
 }
 
-// Call updateProfile & History on load
+// Load profile & history
 updateProfile();
 updateHistory();
 </script>
 
 </body>
-    </html>
+  </html>
