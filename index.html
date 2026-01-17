@@ -28,7 +28,7 @@ footer { font-size:12px; color:#666; margin-top:20px;}
 <body>
 
 <!-- Page 1: Registration -->
-<div id="page-register" class="page active">
+<div id="page-register" class="page">
 <h1>Bangla Earn</h1>
 <div class="card">
 <input type="text" id="regName" placeholder="নাম"><br>
@@ -150,14 +150,31 @@ footer { font-size:12px; color:#666; margin-top:20px;}
 </nav>
 
 <script>
+// ---------- Registration Gate + Single Account ----------
+window.addEventListener('load',()=>{
+    const userName = localStorage.getItem('userName');
+    if(!userName){
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('page-register').classList.add('active');
+    } else {
+        document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+        document.getElementById('page-home').classList.add('active');
+    }
+});
+
 // ---------- Page Navigation ----------
 function showPage(pageId){
+    if(!localStorage.getItem('userName')){ alert('আপনি আগে register করুন!'); return; }
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
 }
 
 // ---------- Registration ----------
 document.getElementById('registerBtn').addEventListener('click',()=>{
+    if(localStorage.getItem('userName')){
+        alert('এই ফোনে ইতিমধ্যেই একাউন্ট তৈরি করা আছে।'); 
+        return;
+    }
     let name=document.getElementById('regName').value;
     let mobile=document.getElementById('regMobile').value;
     let method=document.getElementById('regPayment').value;
@@ -168,7 +185,7 @@ document.getElementById('registerBtn').addEventListener('click',()=>{
     localStorage.setItem('userMethod',method);
     localStorage.setItem('userAcc',acc);
     localStorage.setItem('regDate',new Date().toLocaleDateString());
-    alert('শুভেচ্ছা! Registration Complete!'); // সুন্দর বার্তা
+    alert('শুভেচ্ছা! Registration Complete!');
     showPage('page-home');
     updateProfile();
 });
@@ -200,7 +217,7 @@ document.getElementById('uploadPic').addEventListener('change',function(){
     }
 });
 
-// ---------- Earn Page Logic ----------
+// ---------- Earn Page ----------
 const maxAdsPerDay=100;
 const today=new Date().toISOString().slice(0,10);
 let adsToday=JSON.parse(localStorage.getItem("ads_"+today))||0;
