@@ -5,170 +5,180 @@
 <title>Bangla Earn Mini App</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body{font-family:Arial,sans-serif;background:#f2f5f9;margin:0;padding:20px;}
-.box{background:#fff;padding:25px;border-radius:12px;max-width:420px;margin:auto;box-shadow:0 6px 15px rgba(0,0,0,.1);}
+body{font-family:Arial,sans-serif;background:#f2f5f9;margin:0;padding:0;}
+.container{max-width:420px;margin:auto;padding:15px;}
+.box{background:#fff;padding:20px;border-radius:12px;margin-bottom:15px;box-shadow:0 4px 12px rgba(0,0,0,.1);}
 h1{text-align:center;color:#0a7cff;margin-bottom:15px;}
-.balance{font-size:18px;font-weight:bold;text-align:center;margin-bottom:15px;}
+input, select{width:100%;padding:10px;margin:5px 0;border-radius:8px;border:1px solid #ccc;}
 .btn{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;font-size:16px;background:#0a7cff;color:#fff;cursor:pointer;}
 .btn:disabled{background:#888;cursor:not-allowed;}
-.small{background:#e9eef3;color:#000;margin-top:5px;}
+.navbar{display:flex;justify-content:space-between;background:#fff;position:fixed;bottom:0;width:100%;max-width:420px;margin:auto;padding:5px 0;box-shadow:0 -2px 6px rgba(0,0,0,.1);}
+.navbar button{flex:1;margin:0 2px;padding:10px;font-size:14px;background:#e9eef3;border:none;border-radius:8px;cursor:pointer;}
+.navbar button.active{background:#0a7cff;color:#fff;}
+.balance{text-align:center;font-size:18px;font-weight:bold;margin-bottom:10px;}
 .hidden{display:none;}
-#timer{text-align:center;font-size:22px;margin-top:10px;}
+#timer{text-align:center;font-size:22px;margin:10px 0;}
 .calendar span{display:inline-block;padding:6px 10px;margin:4px;border-radius:6px;background:#eee;}
 .checked{background:#0a7cff;color:#fff;}
-.refbox{background:#f1f4f8;padding:10px;border-radius:8px;margin-top:10px;font-size:14px;}
+.refbox, .history-box{background:#f1f4f8;padding:10px;border-radius:8px;margin-top:10px;font-size:14px;}
 </style>
 </head>
 <body>
 
-<!-- Home Page -->
-<div class="box" id="home">
-<h1>Bangla Earn</h1>
-<p style="text-align:center;">Mini App সফলভাবে চালু হয়েছে ✅</p>
-<button class="btn" onclick="openEarn()">Earn Now</button>
+<div class="container">
+
+<!-- Page 1: Registration -->
+<div class="box" id="page1">
+<h1>Register Account</h1>
+<input type="text" id="regName" placeholder="আপনার নাম">
+<input type="text" id="regMobile" placeholder="মোবাইল নাম্বার">
+<select id="regMethod">
+<option value="">পেমেন্ট মেথড নির্বাচন করুন</option>
+<option value="Bikash">Bikash</option>
+<option value="Nagad">নগদ</option>
+</select>
+<input type="text" id="regAcc" placeholder="Payment Account Number">
+<button class="btn" onclick="registerUser()">Register</button>
+<p id="regMsg" style="text-align:center;margin-top:10px;color:red;"></p>
 </div>
 
-<!-- Dashboard -->
-<div class="box hidden" id="earn">
-<h1>Earn Dashboard</h1>
+<!-- Page 2: Home -->
+<div class="box hidden" id="page2">
+<h1>Bangla Earn</h1>
 <div class="balance">💰 Balance: <span id="bal">0</span> টাকা</div>
+<p style="text-align:center;">Welcome, <span id="userName"></span></p>
+</div>
 
-<button class="btn" id="adBtn" onclick="startAd()">▶️ Ad দেখো (১ টাকা)</button>
+<!-- Page 3: Earn -->
+<div class="box hidden" id="page3">
+<h1>Earn</h1>
+<button class="btn" id="adBtn" onclick="startAd()">▶️ Ad দেখো (1 টাকা)</button>
 <div id="timer"></div>
-
 <button class="btn" onclick="checkIn()">📅 Daily Check-in</button>
 <div class="calendar" id="calendar"></div>
-
 <button class="btn" id="taskBtn" onclick="dailyTask()">📺 Daily Task (10 টাকা)</button>
+<p id="earnMsg" style="text-align:center;margin-top:10px;"></p>
+</div>
 
-<button class="btn" onclick="showReferral()">👥 Referral</button>
-<div id="referralBox" class="refbox hidden"></div>
+<!-- Page 4: Team / Referral -->
+<div class="box hidden" id="page4">
+<h1>Team / Referral</h1>
+<div class="refbox" id="refBox"></div>
+</div>
 
-<button class="btn small" onclick="withdraw()">💳 Withdraw</button>
-<button class="btn small" onclick="goBack()">⬅ Back</button>
+<!-- Page 5: Withdraw -->
+<div class="box hidden" id="page5">
+<h1>Withdraw</h1>
+<p>Payment Method: <span id="payMethod"></span></p>
+<p>Account Number: <span id="payAcc"></span></p>
+<input type="number" id="withdrawAmt" placeholder="টাকার পরিমান">
+<button class="btn" onclick="withdraw()">💳 Withdraw</button>
+<p id="withdrawMsg" style="text-align:center;margin-top:10px;"></p>
+</div>
 
-<p id="msg" style="text-align:center;margin-top:10px;"></p>
+<!-- Page 6: History -->
+<div class="box hidden" id="page6">
+<h1>History</h1>
+<div class="history-box" id="historyBox"></div>
+</div>
+
+<!-- Page 7: Profile -->
+<div class="box hidden" id="page7">
+<h1>Profile</h1>
+<p>নাম: <span id="profileName"></span></p>
+<p>মোবাইল: <span id="profileMobile"></span></p>
+<p>Payment Method: <span id="profileMethod"></span></p>
+<p>Account: <span id="profileAcc"></span></p>
+<p>Registered: <span id="profileDate"></span></p>
+<button class="btn" onclick="editProfile()">Edit Profile</button>
+</div>
+
+<!-- Bottom Navigation -->
+<div class="navbar">
+<button onclick="nav(2)" id="navHome" class="active">Home</button>
+<button onclick="nav(3)" id="navEarn">Earn</button>
+<button onclick="nav(4)" id="navTeam">Team</button>
+<button onclick="nav(5)" id="navWithdraw">Withdraw</button>
+<button onclick="nav(6)" id="navHistory">History</button>
+<button onclick="nav(7)" id="navProfile">Profile</button>
+</div>
+
 </div>
 
 <script>
 // --- Variables ---
+let user = JSON.parse(localStorage.getItem("user")) || null;
 let balance = Number(localStorage.getItem("bal")) || 0;
+let adRunning = false;
 let refCode = localStorage.getItem("refCode") || ("BE"+Math.floor(Math.random()*100000));
 localStorage.setItem("refCode",refCode);
 let referrals = JSON.parse(localStorage.getItem("refList")||"[]");
 document.getElementById("bal").innerText = balance;
 
-// Check if user came via referral link
-let urlParams = new URLSearchParams(window.location.search);
-let usedRef = urlParams.get("ref");
-if(usedRef && !localStorage.getItem("refUsed")){
-    balance += 5;
-    save();
-    localStorage.setItem("refUsed","yes");
-    let list = JSON.parse(localStorage.getItem("refList")||"[]");
-    list.push("User joined via "+usedRef);
-    localStorage.setItem("refList",JSON.stringify(list));
+// --- Registration ---
+function registerUser(){
+    let name = document.getElementById("regName").value.trim();
+    let mobile = document.getElementById("regMobile").value.trim();
+    let method = document.getElementById("regMethod").value;
+    let acc = document.getElementById("regAcc").value.trim();
+    if(!name || !mobile || !method || !acc){document.getElementById("regMsg").innerText="সব ফিল্ড পূরণ করুন"; return;}
+    if(user){document.getElementById("regMsg").innerText="এক মোবাইলে একটাই একাউন্ট allowed"; return;}
+    user = {name,mobile,method,acc,date:new Date().toLocaleDateString()};
+    localStorage.setItem("user",JSON.stringify(user));
+    showHome();
 }
 
-// --- Functions ---
-function openEarn(){
-    home.classList.add("hidden");
-    earn.classList.remove("hidden");
-    renderCalendar();
-    checkButtons();
+// --- Navigation ---
+function nav(page){
+    for(let i=2;i<=7;i++){document.getElementById("page"+i).classList.add("hidden");document.getElementById("nav"+["Home","Earn","Team","Withdraw","History","Profile"][i-2]).classList.remove("active");}
+    document.getElementById("page"+page).classList.remove("hidden");
+    document.getElementById("nav"+["Home","Earn","Team","Withdraw","History","Profile"][page-2]).classList.add("active");
+    if(page==2) showHome();
+    if(page==4) showReferral();
+    if(page==6) showHistory();
+    if(page==7) showProfile();
 }
 
-// Save balance
-function save(){
-    localStorage.setItem("bal",balance);
-    document.getElementById("bal").innerText=balance;
+// --- Home Page ---
+function showHome(){
+    if(!user) return; page1.classList.add("hidden"); page2.classList.remove("hidden");
+    document.getElementById("userName").innerText = user.name;
+    document.getElementById("bal").innerText = balance;
 }
 
-// --- Ad Logic ---
-let adRunning = false;
+// --- Earn Page ---
 function startAd(){
     if(adRunning)return;
-    if(localStorage.getItem("adDone")==today()) return msg("❌ আজকের Ad শেষ হয়েছে");
-    adRunning = true;
-    let t = 15;
-    timer.innerText = "⏳ "+t+"s";
-    document.getElementById("adBtn").disabled = true;
-    let interval = setInterval(()=>{
-        t--;
-        timer.innerText = "⏳ "+t+"s";
-        if(t==0){
-            clearInterval(interval);
-            timer.innerText="";
-            balance += 1;
-            localStorage.setItem("adDone",today());
-            save();
-            msg("✅ Ad Complete +1 টাকা");
-            adRunning = false;
-            checkButtons();
-        }
+    if(localStorage.getItem("adDone")==today()) return msg("আজকের Ad শেষ");
+    adRunning=true; let t=15; document.getElementById("timer").innerText="⏳ "+t+"s";
+    adBtn.disabled=true;
+    let interval=setInterval(()=>{
+        t--; document.getElementById("timer").innerText="⏳ "+t+"s";
+        if(t==0){clearInterval(interval); document.getElementById("timer").innerText=""; balance+=1; localStorage.setItem("bal",balance); localStorage.setItem("adDone",today()); msg("Ad Complete +1"); adRunning=false; adBtn.disabled=false;}
     },1000);
 }
-
-// --- Daily Check-in ---
-function checkIn(){
-    if(localStorage.getItem("checkin")==today()) return msg("❌ আজকের Check-in নেওয়া হয়েছে");
-    balance += 2;
-    localStorage.setItem("checkin",today());
-    save();
-    renderCalendar();
-    msg("✅ Check-in সফল +2 টাকা");
-}
-
-// --- Daily Task ---
-function dailyTask(){
-    if(localStorage.getItem("task")==today()) return msg("❌ আজকের Task শেষ");
-    balance += 10;
-    localStorage.setItem("task",today());
-    save();
-    msg("✅ Task Complete +10 টাকা");
-}
-
-// --- Referral ---
-function showReferral(){
-    let box=document.getElementById("referralBox");
-    box.classList.toggle("hidden");
-    let link = location.origin+location.pathname+"?ref="+refCode;
-    let list = JSON.parse(localStorage.getItem("refList")||"[]");
-    box.innerHTML = `<b>🔗 Your Referral Code:</b> ${refCode}<br>
-<b>📎 Link:</b><br>${link}<br><br>
-<b>👥 Referral History (${list.length}):</b><br>
-${list.length?list.join("<br>"):"No referrals yet"}`;
-}
-
-// --- Withdraw ---
-function withdraw(){
-    if(balance<130) return msg("❌ Withdraw মিনিমাম 130 টাকা");
-    let amt = Math.floor(balance*0.75);
-    balance = 0;
-    save();
-    msg(`✅ Withdraw Request Sent! আপনি পাবেন ${amt} টাকা`);
-}
+function checkIn(){if(localStorage.getItem("checkin")==today()) return msg("আজকের Check-in নেওয়া হয়েছে"); balance+=2; localStorage.setItem("bal",balance); localStorage.setItem("checkin",today()); renderCalendar(); msg("Check-in +2");}
+function dailyTask(){if(localStorage.getItem("task")==today()) return msg("আজকের Task শেষ"); balance+=10; localStorage.setItem("bal",balance); localStorage.setItem("task",today()); msg("Task +10");}
 
 // --- Calendar ---
-function renderCalendar(){
-    calendar.innerHTML="";
-    for(let i=1;i<=7;i++){
-        let s=document.createElement("span");
-        s.innerText="Day "+i;
-        if(i<=new Date().getDate()%7) s.classList.add("checked");
-        calendar.appendChild(s);
-    }
-}
+function renderCalendar(){let d=new Date().getDate(); calendar.innerHTML=""; for(let i=1;i<=7;i++){let s=document.createElement("span"); s.innerText="Day "+i; if(i<=d%7)s.classList.add("checked"); calendar.appendChild(s);}}
+
+// --- Referral / Team ---
+function showReferral(){let box=document.getElementById("refBox"); let link=location.origin+location.pathname+"?ref="+refCode; box.innerHTML=`🔗 Code: ${refCode}<br>Link:<br>${link}<br>Total Refer: ${referrals.length}<br>1st Gen Commission: ... <br>2nd Gen Commission: ...`;}
+
+// --- Withdraw ---
+function withdraw(){let amt = Number(document.getElementById("withdrawAmt").value); if(amt<130) return document.getElementById("withdrawMsg").innerText="Minimum 130 required"; if(amt>balance) return document.getElementById("withdrawMsg").innerText="Insufficient balance"; balance-=amt; localStorage.setItem("bal",balance); document.getElementById("withdrawMsg").innerText="Withdraw request sent (24h)"; showHistory();}
+
+// --- History ---
+function showHistory(){document.getElementById("historyBox").innerHTML=`Balance: ${balance}<br>Ad, Task, Check-in & Referral history here`;}
+
+// --- Profile ---
+function showProfile(){document.getElementById("profileName").innerText=user.name; document.getElementById("profileMobile").innerText=user.mobile; document.getElementById("profileMethod").innerText=user.method; document.getElementById("profileAcc").innerText=user.acc; document.getElementById("profileDate").innerText=user.date;}
+function editProfile(){let newName=prompt("নতুন নাম লিখুন:",user.name); if(newName){user.name=newName; localStorage.setItem("user",JSON.stringify(user)); showProfile(); showHome();}}
 
 // --- Utility ---
-function msg(t){document.getElementById("msg").innerText=t}
-function today(){return new Date().toDateString()}
-function goBack(){earn.classList.add("hidden");home.classList.remove("hidden")}
-function checkButtons(){
-    document.getElementById("adBtn").disabled = (localStorage.getItem("adDone")==today());
-    document.getElementById("taskBtn").disabled = (localStorage.getItem("task")==today());
-}
-</script>
+function msg(t){document.getElementById("earnMsg").innerText=t;}
+function today(){return new Date().toDateString();}
 
-</body>
-</html>
+// --- Initial Load ---
+if(user){page1.classList.add("hidden"); showHome();} else{page1.classList.remove("hidden");}
