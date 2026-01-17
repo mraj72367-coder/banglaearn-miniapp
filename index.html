@@ -1,61 +1,114 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-  <meta charset="UTF-8">
-  <title>Bangla Earn Mini App</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="UTF-8">
+<title>Bangla Earn Mini App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <style>
-    body{
-      font-family: Arial, sans-serif;
-      background:#f4f6f8;
-      text-align:center;
-      padding:40px;
-    }
-    .box{
-      background:#fff;
-      padding:25px;
-      border-radius:10px;
-      box-shadow:0 0 10px rgba(0,0,0,.1);
-      max-width:400px;
-      margin:auto;
-    }
-    h1{color:#0a7cff;}
-    button{
-      background:#0a7cff;
-      color:#fff;
-      border:none;
-      padding:12px 20px;
-      font-size:16px;
-      border-radius:6px;
-      cursor:pointer;
-      margin-top:15px;
-    }
-    #msg{
-      margin-top:15px;
-      color:green;
-      font-weight:bold;
-      display:none;
-    }
-  </style>
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f2f5f9;
+  margin:0;
+  padding:20px;
+}
+.box{
+  background:#fff;
+  padding:20px;
+  border-radius:12px;
+  max-width:420px;
+  margin:auto;
+  box-shadow:0 4px 12px rgba(0,0,0,.1);
+}
+h1{text-align:center;color:#0a7cff;}
+.btn{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border:none;
+  border-radius:8px;
+  font-size:16px;
+  background:#0a7cff;
+  color:#fff;
+}
+.small{
+  background:#e9eef3;
+  color:#000;
+}
+.hidden{display:none;}
+.balance{
+  font-size:18px;
+  font-weight:bold;
+  margin:10px 0;
+  text-align:center;
+}
+</style>
 </head>
+
 <body>
 
-  <div class="box">
-    <h1>Bangla Earn</h1>
-    <p>Mini App সফলভাবে চালু হয়েছে ✅</p>
+<div class="box" id="home">
+  <h1>Bangla Earn</h1>
+  <p style="text-align:center;">Mini App সফলভাবে চালু হয়েছে ✅</p>
+  <button class="btn" onclick="openEarn()">Earn Now</button>
+</div>
 
-    <button onclick="earnNow()">Earn Now</button>
+<div class="box hidden" id="earn">
+  <h1>Earn Dashboard</h1>
+  <div class="balance">💰 Balance: <span id="bal">0</span> টাকা</div>
 
-    <div id="msg">🎉 Earn system খুব শিগগিরই চালু হবে!</div>
-  </div>
+  <button class="btn" onclick="watchAd()">▶️ Ad দেখো (১ টাকা)</button>
+  <button class="btn" onclick="checkIn()">📅 Daily Check-in</button>
+  <button class="btn" onclick="task()">📺 Daily Task (10 টাকা)</button>
+  <button class="btn small" onclick="withdraw()">💳 Withdraw</button>
+  <button class="btn small" onclick="goBack()">⬅ Back</button>
 
-  <script>
-    function earnNow(){
-      document.getElementById("msg").style.display = "block";
-    }
-  </script>
+  <p id="msg" style="text-align:center;margin-top:10px;"></p>
+</div>
+
+<script>
+let balance = 0;
+
+function openEarn(){
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("earn").classList.remove("hidden");
+}
+
+function watchAd(){
+  balance += 1;
+  update("✅ Ad দেখা হয়েছে, +1 টাকা");
+}
+
+function checkIn(){
+  balance += 2;
+  update("✅ Daily Check-in সফল, +2 টাকা");
+}
+
+function task(){
+  balance += 10;
+  update("✅ Task complete, +10 টাকা");
+}
+
+function withdraw(){
+  if(balance < 130){
+    update("❌ Withdraw করতে মিনিমাম 130 টাকা লাগবে");
+  }else{
+    let get = Math.floor(balance * 0.75);
+    update("✅ Withdraw Request Sent! আপনি পাবেন "+get+" টাকা");
+    balance = 0;
+  }
+}
+
+function update(text){
+  document.getElementById("bal").innerText = balance;
+  document.getElementById("msg").innerText = text;
+}
+
+function goBack(){
+  document.getElementById("earn").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+</script>
 
 </body>
 </html>
