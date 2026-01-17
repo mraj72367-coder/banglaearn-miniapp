@@ -5,28 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bangla Earn Mini App</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
 <style>
-body { font-family: Arial, sans-serif; margin:0; padding:0; text-align:center; background:#f9f9f9;}
-h1,h2 { color:#00a2ff; margin:10px 0;}
+body { font-family: Arial, sans-serif; margin:0; padding:0; text-align:center; background:#f0f4f8;}
+h1,h2 { color:#1a73e8; margin:10px 0;}
 p,span { font-size:16px; color:#333;}
-button { padding:10px 20px; margin:5px; font-size:16px; border:none; border-radius:8px; cursor:pointer; background:#00a2ff; color:#fff;}
-button:hover { background:#0081cc;}
-.page { display:none; padding-bottom:60px;}
+button { padding:10px 20px; margin:5px; font-size:16px; border:none; border-radius:8px; cursor:pointer; background:#1a73e8; color:#fff;}
+button:hover { background:#0b59c1;}
+.page { display:none; padding-bottom:70px; min-height:calc(100vh - 70px);}
 .active { display:block;}
-nav { position:fixed; bottom:0; width:100%; background:#eee; display:flex; justify-content:space-around; padding:5px 0;}
-nav button { flex:1; margin:0; border-radius:0;}
+nav { position:fixed; bottom:0; width:100%; background:#1a73e8; display:flex; justify-content:space-around; padding:8px 0; box-shadow: 0 -2px 5px rgba(0,0,0,0.15);}
+nav button { flex:1; margin:0 2px; border-radius:10px; border:none; font-weight:bold; color:#fff; background:#1a73e8;}
+nav button:hover { background:#0b59c1;}
 input, select { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid #ccc;}
-#timer { font-size:18px; color:#ff5722; margin:10px;}
 ul { list-style:none; padding:0;}
 li { text-align:left; margin:5px 20px;}
+#timer { font-size:18px; color:#ff5722; margin:10px;}
+footer { font-size:12px; color:#666; margin-top:20px;}
+.profile-pic { width:100px; height:100px; border-radius:50%; margin:10px auto;}
+.card { background:#fff; padding:15px; margin:10px 15px; border-radius:12px; box-shadow:0 2px 6px rgba(0,0,0,0.1);}
 </style>
 </head>
 <body>
 
 <!-- Page 1: Registration -->
 <div id="page-register" class="page active">
-<h1>Bangla Earn Registration</h1>
+<h1>Bangla Earn</h1>
+<div class="card">
 <input type="text" id="regName" placeholder="নাম"><br>
 <input type="text" id="regMobile" placeholder="মোবাইল নাম্বার"><br>
 <select id="regPayment">
@@ -36,68 +40,103 @@ li { text-align:left; margin:5px 20px;}
 <input type="text" id="regAcc" placeholder="পেমেন্ট একাউন্ট নাম্বার"><br>
 <button id="registerBtn">Register</button>
 </div>
+<footer>টাকা আয় করুন সহজ আর বিশ্বস্ত মাধ্যম থেকে "Bangla Earn" এ আপনাকে স্বাগতম।<br>Developed by আর ইসলাম রাকিব</footer>
+</div>
 
 <!-- Page 2: Home -->
 <div id="page-home" class="page">
-<h1>Bangla Earn Home</h1>
-<p>আজকের এড দেখা হয়েছে: <span id="adsCount">0</span>/100</p>
-<button id="goEarn">Earn Page</button>
+<h1>Bangla Earn</h1>
+<div class="card">
+<p>মোট বেলেন্স: <span id="balance">0</span> টাকা</p>
+<h3>কাজের নিয়ম:</h3>
+<ul>
+<li>প্রতিদিন সর্বোচ্চ 100 এড দেখুন।</li>
+<li>Daily Check-in করতে ভুলবেন না।</li>
+<li>Daily Task সম্পন্ন করলে 20 টাকা পাবেন।</li>
+<li>প্রতিটি রেফারাল থেকে কমিশন 10 টাকা।</li>
+<li>উত্তোলন min 130 টাকা, max 1010 টাকা।</li>
+</ul>
+</div>
 </div>
 
 <!-- Page 3: Earn -->
 <div id="page-earn" class="page">
-<h1>Earn Page</h1>
+<h1>Bangla Earn</h1>
+<div class="card">
 <p>এড দেখো (1 টাকা / ad)</p>
 <button id="adBtn">এড দেখো</button>
 <div id="timer"></div>
+<p>আজকের এড: <span id="todayAds">0</span>/100</p>
+<p>মোট এড ভিউ (15 দিন): <span id="totalAds">0</span></p>
+</div>
 
-<p>Daily Check-in</p>
+<div class="card">
+<h3>Daily Check-in</h3>
+<div id="checkinChart"></div>
 <button id="checkinBtn">Check-in</button>
 <p id="checkinMsg"></p>
+</div>
 
-<p>Daily Task</p>
-<button id="taskBtn">Task Complete (10 টাকা)</button>
+<div class="card">
+<h3>Daily Task</h3>
+<button id="taskBtn">Complete Task (20 টাকা)</button>
 <p id="taskMsg"></p>
 </div>
-
-<!-- Page 4: Team / Referral -->
-<div id="page-team" class="page">
-<h1>Team / Referral</h1>
-<p>তোমার রেফারাল লিংক: <span id="refLink">USER123</span> <button onclick="copyReferral()">Copy</button></p>
-<p>Total Referral: <span id="totalRef">0</span></p>
-<p>Total Referral Income: <span id="refIncome">0</span> টাকা</p>
-<p>1st Generation Commission: <span id="gen1">0</span> টাকা</p>
-<p>2nd Generation Commission: <span id="gen2">0</span> টাকা</p>
 </div>
 
-<!-- Page 5: Withdraw -->
+<!-- Page 4: Team -->
+<div id="page-team" class="page">
+<h1>Bangla Earn</h1>
+<div class="card">
+<p>Referral link: <span id="refLink">USER123</span> <button onclick="copyReferral()">Copy</button></p>
+<p>Total Referral: <span id="totalRef">0</span></p>
+<p>Total Referral Income: <span id="refIncome">0</span> টাকা</p>
+<p>1st Gen Commission: <span id="gen1">0</span> টাকা</p>
+<p>2nd Gen Commission: <span id="gen2">0</span> টাকা</p>
+<p>“Teamwork makes the dream work.”</p>
+</div>
+</div>
+
+<!-- Page 5: History -->
+<div id="page-history" class="page">
+<h1>Bangla Earn</h1>
+<div class="card">
+<h3>Earnings History (Top 50)</h3>
+<ul id="earnHistory"></ul>
+<h3>Withdraw History</h3>
+<ul id="withdrawHistory"></ul>
+</div>
+</div>
+
+<!-- Page 6: Withdraw -->
 <div id="page-withdraw" class="page">
-<h1>Withdraw</h1>
-<p>Min: 130, Max: 1010 টাকা</p>
+<h1>Bangla Earn</h1>
+<div class="card">
 <p>Payment Method: <span id="payMethod"></span></p>
 <p>Account: <span id="payAcc"></span></p>
 <input type="number" id="withdrawAmount" placeholder="টাকার পরিমান"><br>
 <button id="withdrawBtn">Request Withdraw</button>
 <p id="withdrawMsg"></p>
 </div>
-
-<!-- Page 6: History -->
-<div id="page-history" class="page">
-<h1>History</h1>
-<h2>Earnings</h2>
-<ul id="earnHistory"></ul>
-<h2>Withdrawals</h2>
-<ul id="withdrawHistory"></ul>
 </div>
 
 <!-- Page 7: Profile -->
 <div id="page-profile" class="page">
-<h1>Profile</h1>
+<h1>Bangla Earn</h1>
+<div class="card">
+<img src="" alt="Profile Picture" id="profPic" class="profile-pic"><br>
+<label>Upload Profile Picture:</label>
+<input type="file" id="uploadPic"><br>
+<label>Edit Name:</label>
+<input type="text" id="editName" placeholder="নাম পরিবর্তন করো"><br>
+<button id="saveProfile">Save Profile</button>
+<hr>
+<p>User ID: <span id="userId">USER123</span></p>
 <p>Name: <span id="profName"></span></p>
-<p>Mobile: <span id="profMobile"></span></p>
 <p>Payment Method: <span id="profMethod"></span></p>
 <p>Account: <span id="profAcc"></span></p>
 <p>Registration Date: <span id="profDate"></span></p>
+</div>
 </div>
 
 <!-- Navigation -->
@@ -105,19 +144,19 @@ li { text-align:left; margin:5px 20px;}
 <button onclick="showPage('page-home')">Home</button>
 <button onclick="showPage('page-earn')">Earn</button>
 <button onclick="showPage('page-team')">Team</button>
-<button onclick="showPage('page-withdraw')">Withdraw</button>
 <button onclick="showPage('page-history')">History</button>
+<button onclick="showPage('page-withdraw')">Withdraw</button>
 <button onclick="showPage('page-profile')">Profile</button>
 </nav>
 
 <script>
-// ----- Page Navigation -----
+// ---------- Page Navigation ----------
 function showPage(pageId){
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     document.getElementById(pageId).classList.add('active');
 }
 
-// ----- Registration -----
+// ---------- Registration ----------
 document.getElementById('registerBtn').addEventListener('click',()=>{
     let name=document.getElementById('regName').value;
     let mobile=document.getElementById('regMobile').value;
@@ -129,28 +168,45 @@ document.getElementById('registerBtn').addEventListener('click',()=>{
     localStorage.setItem('userMethod',method);
     localStorage.setItem('userAcc',acc);
     localStorage.setItem('regDate',new Date().toLocaleDateString());
-    alert('Registration Complete!');
-    updateProfile();
+    alert('শুভেচ্ছা! Registration Complete!'); // সুন্দর বার্তা
     showPage('page-home');
+    updateProfile();
 });
 
-// ----- Profile Update -----
+// ---------- Profile ----------
 function updateProfile(){
     document.getElementById('profName').innerText=localStorage.getItem('userName')||'';
-    document.getElementById('profMobile').innerText=localStorage.getItem('userMobile')||'';
+    document.getElementById('editName').value=localStorage.getItem('userName')||'';
     document.getElementById('profMethod').innerText=localStorage.getItem('userMethod')||'';
     document.getElementById('profAcc').innerText=localStorage.getItem('userAcc')||'';
     document.getElementById('profDate').innerText=localStorage.getItem('regDate')||'';
     document.getElementById('payMethod').innerText=localStorage.getItem('userMethod')||'';
     document.getElementById('payAcc').innerText=localStorage.getItem('userAcc')||'';
 }
+document.getElementById('saveProfile').addEventListener('click',()=>{
+    let newName=document.getElementById('editName').value;
+    if(newName){
+        localStorage.setItem('userName',newName); 
+        updateProfile();
+        alert('Name Updated!');
+    }
+});
+document.getElementById('uploadPic').addEventListener('change',function(){
+    const file = this.files[0];
+    if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){ document.getElementById('profPic').src=e.target.result; }
+        reader.readAsDataURL(file);
+    }
+});
 
-// ----- Earn Page Logic -----
-// Ads
+// ---------- Earn Page Logic ----------
 const maxAdsPerDay=100;
 const today=new Date().toISOString().slice(0,10);
 let adsToday=JSON.parse(localStorage.getItem("ads_"+today))||0;
-document.getElementById('adsCount').innerText=adsToday;
+document.getElementById('todayAds').innerText=adsToday;
+let totalAds=JSON.parse(localStorage.getItem("totalAds")||0);
+document.getElementById('totalAds').innerText=totalAds;
 
 document.getElementById('adBtn').addEventListener('click',()=>{
     if(adsToday>=maxAdsPerDay){ alert("আজকের 100 এড limit শেষ!"); return; }
@@ -168,12 +224,18 @@ document.getElementById('adBtn').addEventListener('click',()=>{
             timerDiv.innerText="";
             document.getElementById('adBtn').disabled=false;
             adsToday++;
+            totalAds++;
             localStorage.setItem("ads_"+today,JSON.stringify(adsToday));
-            document.getElementById('adsCount').innerText=adsToday;
-            alert(`Ad complete! +1 টাকা balance-এ যোগ হয়েছে।`);
+            localStorage.setItem("totalAds",JSON.stringify(totalAds));
+            document.getElementById('todayAds').innerText=adsToday;
+            document.getElementById('totalAds').innerText=totalAds;
+            let balance=Number(localStorage.getItem('balance')||0)+1;
+            localStorage.setItem('balance',balance);
+            document.getElementById('balance').innerText=balance;
             let earnHist=JSON.parse(localStorage.getItem('earnHistory')||'[]');
             earnHist.push({date:new Date().toLocaleString(),amount:1});
             localStorage.setItem('earnHistory',JSON.stringify(earnHist));
+            alert(`Ad complete! +1 টাকা balance-এ যোগ হয়েছে।`);
         }
     },1000);
 });
@@ -183,29 +245,26 @@ document.getElementById('checkinBtn').addEventListener('click',()=>{
     const checkinKey="checkin_"+today;
     if(localStorage.getItem(checkinKey)){ alert("আজকে check-in করা হয়ে গেছে!"); return;}
     let dayCount = Number(localStorage.getItem("checkinDay")||0)+1;
-    let reward = dayCount; // 1st day=1, 2nd day=2
+    let reward = dayCount;
+    let balance=Number(localStorage.getItem('balance')||0)+reward;
+    localStorage.setItem('balance',balance);
+    document.getElementById('balance').innerText=balance;
     let earnHist=JSON.parse(localStorage.getItem('earnHistory')||'[]');
     earnHist.push({date:new Date().toLocaleString(),amount:reward});
     localStorage.setItem('earnHistory',JSON.stringify(earnHist));
     localStorage.setItem(checkinKey,true);
     localStorage.setItem("checkinDay",dayCount);
     alert(`Check-in Complete! +${reward} টাকা`);
-    document.getElementById('checkinMsg').innerText=`আজকের check-in করা হয়েছে। (+${reward} টাকা)`;
+    document.getElementById('checkinMsg').innerText=`আজকের check-in সম্পন্ন হয়েছে। (+${reward} টাকা)`;
 });
 
 // Daily Task
 document.getElementById('taskBtn').addEventListener('click',()=>{
-    const taskKey="task_"+today;
-    if(localStorage.getItem(taskKey)){ alert("আজকের task করা হয়ে গেছে!"); return;}
-    let earnHist=JSON.parse(localStorage.getItem('earnHistory')||'[]');
-    earnHist.push({date:new Date().toLocaleString(),amount:10});
-    localStorage.setItem('earnHistory',JSON.stringify(earnHist));
-    localStorage.setItem(taskKey,true);
-    alert("Daily Task Complete! +10 টাকা");
-    document.getElementById('taskMsg').innerText="আজকের Daily Task সম্পন্ন হয়েছে (+10 টাকা)";
+    alert("Daily Task আসছে শীঘ্রই!"); 
+    setTimeout(()=>{ document.getElementById('taskMsg').innerText=""; },3000);
 });
 
-// ----- Team / Referral -----
+// ---------- Team / Referral ----------
 const referralCode="USER123";
 document.getElementById('refLink').innerText=referralCode;
 function copyReferral(){ navigator.clipboard.writeText(referralCode); alert("Referral Copied!"); }
@@ -214,7 +273,7 @@ document.getElementById('refIncome').innerText=0;
 document.getElementById('gen1').innerText=0;
 document.getElementById('gen2').innerText=0;
 
-// ----- Withdraw -----
+// ---------- Withdraw ----------
 document.getElementById('withdrawBtn').addEventListener('click',()=>{
     let amount=Number(document.getElementById('withdrawAmount').value);
     if(amount<130){ alert("Minimum withdraw 130 টাকা"); return;}
@@ -226,23 +285,27 @@ document.getElementById('withdrawBtn').addEventListener('click',()=>{
     let wHist=JSON.parse(localStorage.getItem('withdrawHistory')||'[]');
     wHist.push({date:new Date().toLocaleString(),amount:amount});
     localStorage.setItem('withdrawHistory',JSON.stringify(wHist));
+    let balance=Number(localStorage.getItem('balance')||0)-amount;
+    localStorage.setItem('balance',balance);
+    document.getElementById('balance').innerText=balance;
     document.getElementById('withdrawMsg').innerText="Withdraw Request Sent!";
 });
 
-// ----- History -----
+// ---------- History ----------
 function updateHistory(){
     let earnHist=JSON.parse(localStorage.getItem('earnHistory')||'[]');
     let wHist=JSON.parse(localStorage.getItem('withdrawHistory')||'[]');
     const eList=document.getElementById('earnHistory');
     const wList=document.getElementById('withdrawHistory');
     eList.innerHTML=""; wList.innerHTML="";
-    earnHist.forEach(e=>{ let li=document.createElement('li'); li.innerText=`${e.date} → ${e.amount} টাকা`; eList.appendChild(li); });
-    wHist.forEach(w=>{ let li=document.createElement('li'); li.innerText=`${w.date} → ${w.amount} টাকা`; wList.appendChild(li); });
+    earnHist.slice(-50).forEach(e=>{ let li=document.createElement('li'); li.innerText=`${e.date} → ${e.amount} টাকা`; eList.appendChild(li); });
+    wHist.slice(-50).forEach(w=>{ let li=document.createElement('li'); li.innerText=`${w.date} → ${w.amount} টাকা`; wList.appendChild(li); });
 }
 
 // Load profile & history
 updateProfile();
 updateHistory();
+document.getElementById('balance').innerText=Number(localStorage.getItem('balance')||0);
 </script>
 
 </body>
