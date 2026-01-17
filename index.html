@@ -4,111 +4,152 @@
 <meta charset="UTF-8">
 <title>Bangla Earn Mini App</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-body{
-  font-family: Arial, sans-serif;
-  background:#f2f5f9;
-  margin:0;
-  padding:20px;
-}
-.box{
-  background:#fff;
-  padding:20px;
-  border-radius:12px;
-  max-width:420px;
-  margin:auto;
-  box-shadow:0 4px 12px rgba(0,0,0,.1);
-}
-h1{text-align:center;color:#0a7cff;}
-.btn{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  background:#0a7cff;
-  color:#fff;
-}
-.small{
-  background:#e9eef3;
-  color:#000;
-}
-.hidden{display:none;}
-.balance{
-  font-size:18px;
-  font-weight:bold;
-  margin:10px 0;
-  text-align:center;
-}
+body{font-family:Arial;background:#f2f5f9;padding:20px}
+.box{background:#fff;padding:20px;border-radius:12px;max-width:420px;margin:auto;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+h1{text-align:center;color:#0a7cff}
+.btn{width:100%;padding:12px;margin-top:10px;border:none;border-radius:8px;font-size:16px;background:#0a7cff;color:#fff}
+.small{background:#e9eef3;color:#000}
+.hidden{display:none}
+.balance{text-align:center;font-size:18px;font-weight:bold}
+.calendar span{display:inline-block;padding:6px 10px;margin:4px;border-radius:6px;background:#eee}
+.checked{background:#0a7cff;color:#fff}
+#timer{text-align:center;font-size:22px;margin-top:10px}
+.refbox{background:#f1f4f8;padding:10px;border-radius:8px;margin-top:10px;font-size:14px}
 </style>
 </head>
 
 <body>
 
 <div class="box" id="home">
-  <h1>Bangla Earn</h1>
-  <p style="text-align:center;">Mini App সফলভাবে চালু হয়েছে ✅</p>
-  <button class="btn" onclick="openEarn()">Earn Now</button>
+<h1>Bangla Earn</h1>
+<p style="text-align:center;">Mini App সফলভাবে চালু হয়েছে ✅</p>
+<button class="btn" onclick="openEarn()">Earn Now</button>
 </div>
 
 <div class="box hidden" id="earn">
-  <h1>Earn Dashboard</h1>
-  <div class="balance">💰 Balance: <span id="bal">0</span> টাকা</div>
+<h1>Earn Dashboard</h1>
+<div class="balance">💰 Balance: <span id="bal">0</span> টাকা</div>
 
-  <button class="btn" onclick="watchAd()">▶️ Ad দেখো (১ টাকা)</button>
-  <button class="btn" onclick="checkIn()">📅 Daily Check-in</button>
-  <button class="btn" onclick="task()">📺 Daily Task (10 টাকা)</button>
-  <button class="btn small" onclick="withdraw()">💳 Withdraw</button>
-  <button class="btn small" onclick="goBack()">⬅ Back</button>
+<button class="btn" onclick="startAd()">▶️ Ad দেখো (১ টাকা)</button>
+<div id="timer"></div>
 
-  <p id="msg" style="text-align:center;margin-top:10px;"></p>
+<button class="btn" onclick="checkIn()">📅 Daily Check-in</button>
+<div class="calendar" id="calendar"></div>
+
+<button class="btn" onclick="dailyTask()">📺 Daily Task (10 টাকা)</button>
+
+<button class="btn" onclick="showReferral()">👥 Referral</button>
+<div id="referralBox" class="refbox hidden"></div>
+
+<button class="btn small" onclick="withdraw()">💳 Withdraw</button>
+<button class="btn small" onclick="goBack()">⬅ Back</button>
+
+<p id="msg" style="text-align:center;margin-top:10px;"></p>
 </div>
 
 <script>
-let balance = 0;
+let balance = Number(localStorage.getItem("bal")) || 0;
+let refCode = localStorage.getItem("refCode") || ("BE"+Math.floor(Math.random()*100000));
+localStorage.setItem("refCode",refCode);
 
-function openEarn(){
-  document.getElementById("home").classList.add("hidden");
-  document.getElementById("earn").classList.remove("hidden");
+let referrals = JSON.parse(localStorage.getItem("refList")||"[]");
+
+document.getElementById("bal").innerText = balance;
+
+// referral bonus on first open
+let urlParams = new URLSearchParams(window.location.search);
+let usedRef = urlParams.get("ref");
+if(usedRef && !localStorage.getItem("refUsed")){
+balance+=5;
+save();
+localStorage.setItem("refUsed","yes");
+let list = JSON.parse(localStorage.getItem("refList")||"[]");
+list.push("User joined via "+usedRef);
+localStorage.setItem("refList",JSON.stringify(list));
 }
 
-function watchAd(){
-  balance += 1;
-  update("✅ Ad দেখা হয়েছে, +1 টাকা");
+function openEarn(){
+home.classList.add("hidden");
+earn.classList.remove("hidden");
+renderCalendar();
+}
+
+function save(){
+localStorage.setItem("bal",balance);
+document.getElementById("bal").innerText=balance;
+}
+
+function startAd(){
+if(localStorage.getItem("adDone")==today())return msg("❌ আজকের Ad দেখা শেষ");
+let t=15;
+timer.innerText="⏳ "+t+"s";
+let i=setInterval(()=>{
+t--;
+timer.innerText="⏳ "+t+"s";
+if(t==0){
+clearInterval(i);
+timer.innerText="";
+balance+=1;
+localStorage.setItem("adDone",today());
+save();
+msg("✅ Ad Complete +1 টাকা");
+}
+},1000);
 }
 
 function checkIn(){
-  balance += 2;
-  update("✅ Daily Check-in সফল, +2 টাকা");
+if(localStorage.getItem("checkin")==today())return msg("❌ আজকের Check-in নেওয়া হয়েছে");
+balance+=2;
+localStorage.setItem("checkin",today());
+save();
+renderCalendar();
+msg("✅ Check-in সফল +2 টাকা");
 }
 
-function task(){
-  balance += 10;
-  update("✅ Task complete, +10 টাকা");
+function dailyTask(){
+if(localStorage.getItem("task")==today())return msg("❌ আজকের Task শেষ");
+balance+=10;
+localStorage.setItem("task",today());
+save();
+msg("✅ Task Complete +10 টাকা");
+}
+
+function showReferral(){
+let box=document.getElementById("referralBox");
+box.classList.toggle("hidden");
+let link=location.origin+location.pathname+"?ref="+refCode;
+let list=JSON.parse(localStorage.getItem("refList")||"[]");
+box.innerHTML=`
+<b>🔗 Your Referral Code:</b> ${refCode}<br>
+<b>📎 Link:</b><br>${link}<br><br>
+<b>👥 Referral History (${list.length}):</b><br>
+${list.length?list.join("<br>"):"No referrals yet"}
+`;
 }
 
 function withdraw(){
-  if(balance < 130){
-    update("❌ Withdraw করতে মিনিমাম 130 টাকা লাগবে");
-  }else{
-    let get = Math.floor(balance * 0.75);
-    update("✅ Withdraw Request Sent! আপনি পাবেন "+get+" টাকা");
-    balance = 0;
-  }
+if(balance<130)return msg("❌ Withdraw মিনিমাম 130 টাকা");
+balance=0;
+save();
+msg("✅ Withdraw Request Sent");
 }
 
-function update(text){
-  document.getElementById("bal").innerText = balance;
-  document.getElementById("msg").innerText = text;
+function renderCalendar(){
+calendar.innerHTML="";
+let d=new Date().getDate();
+for(let i=1;i<=7;i++){
+let s=document.createElement("span");
+s.innerText="Day "+i;
+if(i<=d%7)s.classList.add("checked");
+calendar.appendChild(s);
+}
 }
 
-function goBack(){
-  document.getElementById("earn").classList.add("hidden");
-  document.getElementById("home").classList.remove("hidden");
-}
+function msg(t){document.getElementById("msg").innerText=t}
+function today(){return new Date().toDateString()}
+function goBack(){earn.classList.add("hidden");home.classList.remove("hidden")}
 </script>
 
 </body>
-</html>
+  </html>
