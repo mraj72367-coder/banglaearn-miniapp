@@ -2,205 +2,210 @@
 <html lang="bn">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Bangla Earn Mini App</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
 <style>
-body{margin:0;padding:0;font-family:'Roboto',sans-serif;background:#f5f7fb;}
-.container{max-width:420px;margin:auto;padding:15px;}
-.card{background:#fff;border-radius:15px;box-shadow:0 6px 15px rgba(0,0,0,0.08);padding:20px;margin-bottom:15px;}
-h1{text-align:center;color:#0a7cff;margin-bottom:15px;font-weight:700;}
-input, select{width:100%;padding:12px;margin:6px 0;border-radius:10px;border:1px solid #ccc;font-size:16px;}
-.btn{width:100%;padding:14px;margin-top:12px;border:none;border-radius:10px;font-size:16px;background:#0a7cff;color:#fff;font-weight:500;cursor:pointer;transition:0.3s;}
-.btn:hover{background:#0965d3;}
-.btn:disabled{background:#aaa;cursor:not-allowed;}
-.navbar{display:flex;justify-content:space-between;position:fixed;bottom:0;width:100%;max-width:420px;margin:auto;padding:5px 0;background:#fff;box-shadow:0 -3px 8px rgba(0,0,0,0.1);}
-.navbar button{flex:1;margin:0 2px;padding:10px;font-size:14px;border:none;border-radius:10px;background:#e9eef3;cursor:pointer;transition:0.3s;}
-.navbar button.active{background:#0a7cff;color:#fff;}
-.balance{text-align:center;font-size:18px;font-weight:700;margin-bottom:10px;}
-.hidden{display:none;}
-#timer{text-align:center;font-size:22px;margin:12px 0;color:#ff5722;font-weight:500;}
-.calendar span{display:inline-block;padding:6px 12px;margin:4px;border-radius:8px;background:#eee;font-size:14px;}
-.checked{background:#0a7cff;color:#fff;}
-.refbox, .history-box, .info-box{background:#f1f4f8;padding:12px;border-radius:10px;margin-top:10px;font-size:14px;}
-.copy-btn{padding:6px 10px;margin-top:5px;background:#0a7cff;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:14px;}
-.copy-btn:hover{background:#0965d3;}
+body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f9f9f9; text-align:center;}
+h1,h2 { color: #00a2ff; margin:10px 0; }
+p { color: #333; font-size: 16px; }
+button { padding:10px 20px; font-size:16px; margin:10px; border:none; border-radius:8px; cursor:pointer; background:#00a2ff; color:#fff;}
+button:hover { background:#0081cc;}
+#timer { font-size:18px; color:#ff5722; margin:10px;}
+nav { position: fixed; bottom:0; width:100%; background:#eee; display:flex; justify-content:space-around; padding:5px 0; }
+nav button { flex:1; margin:0; border-radius:0;}
+.page { display:none; padding-bottom:60px; } /* space for nav */
+.active { display:block; }
+input { padding:8px; margin:5px; width:80%; border-radius:6px; border:1px solid #ccc;}
 </style>
 </head>
 <body>
-<div class="container">
 
 <!-- Page 1: Registration -->
-<div class="card" id="page1">
-<h1>Register Account</h1>
-<input type="text" id="regName" placeholder="আপনার নাম">
-<input type="text" id="regMobile" placeholder="মোবাইল নাম্বার">
-<select id="regMethod">
-<option value="">পেমেন্ট মেথড নির্বাচন করুন</option>
-<option value="Bikash">Bikash</option>
-<option value="Nagad">নগদ</option>
-</select>
-<input type="text" id="regAcc" placeholder="Payment Account Number">
-<button class="btn" onclick="registerUser()">Register</button>
-<p id="regMsg" style="text-align:center;margin-top:10px;color:red;"></p>
+<div id="page-register" class="page active">
+<h1>Bangla Earn Registration</h1>
+<input type="text" id="regName" placeholder="নাম"><br>
+<input type="text" id="regMobile" placeholder="মোবাইল নাম্বার"><br>
+<select id="regPayment">
+  <option value="Bikash">Bikash</option>
+  <option value="Nagad">Nagad</option>
+</select><br>
+<input type="text" id="regAcc" placeholder="পেমেন্ট একাউন্ট নাম্বার"><br>
+<button id="registerBtn">Register</button>
 </div>
 
 <!-- Page 2: Home -->
-<div class="card hidden" id="page2">
-<h1>Bangla Earn</h1>
-<div class="balance">💰 Balance: <span id="bal">0</span> টাকা</div>
-<p style="text-align:center;">Welcome, <span id="userName"></span></p>
-</div>
-
-<!-- Page 3: Earn -->
-<div class="card hidden" id="page3">
-<h1>Earn</h1>
-<button class="btn" id="adBtn" onclick="startAd()">▶️ Ad দেখো (1 টাকা)</button>
+<div id="page-home" class="page">
+<h1>Bangla Earn Home</h1>
+<p>আজকের এড দেখা হয়েছে: <span id="adsCount">0</span>/100</p>
+<button id="goEarn">এড দেখো</button>
 <div id="timer"></div>
-<button class="btn" onclick="checkIn()">📅 Daily Check-in</button>
-<div class="calendar" id="calendar"></div>
-<button class="btn" id="taskBtn" onclick="dailyTask()">📺 Daily Task (10 টাকা)</button>
-<p id="earnMsg" style="text-align:center;margin-top:10px;"></p>
 </div>
 
-<!-- Page 4: Team / Referral -->
-<div class="card hidden" id="page4">
+<!-- Page 3: Team / Referral -->
+<div id="page-team" class="page">
 <h1>Team / Referral</h1>
-<div class="refbox" id="refBox"></div>
+<p>তোমার রেফারাল লিংক: <span id="refLink">USER123</span> <button onclick="copyReferral()">Copy</button></p>
+<p>Total Referral: <span id="totalRef">0</span></p>
+<p>Total Referral Income: <span id="refIncome">0</span> টাকা</p>
+<p>1st Generation Commission: <span id="gen1">0</span> টাকা</p>
+<p>2nd Generation Commission: <span id="gen2">0</span> টাকা</p>
 </div>
 
-<!-- Page 5: Withdraw -->
-<div class="card hidden" id="page5">
+<!-- Page 4: Withdraw -->
+<div id="page-withdraw" class="page">
 <h1>Withdraw</h1>
-<div class="info-box">
+<p>Min: 130, Max: 1010 টাকা</p>
 <p>Payment Method: <span id="payMethod"></span></p>
-<p>Account Number: <span id="payAcc"></span></p>
-</div>
-<input type="number" id="withdrawAmt" placeholder="টাকার পরিমান">
-<button class="btn" onclick="withdraw()">💳 Withdraw</button>
-<p id="withdrawMsg" style="text-align:center;margin-top:10px;color:green;"></p>
+<p>Account: <span id="payAcc"></span></p>
+<input type="number" id="withdrawAmount" placeholder="টাকার পরিমান"><br>
+<button id="withdrawBtn">Request Withdraw</button>
+<p id="withdrawMsg"></p>
 </div>
 
-<!-- Page 6: History -->
-<div class="card hidden" id="page6">
+<!-- Page 5: History -->
+<div id="page-history" class="page">
 <h1>History</h1>
-<div class="history-box" id="historyBox"></div>
+<h2>Earnings</h2>
+<ul id="earnHistory"></ul>
+<h2>Withdrawals</h2>
+<ul id="withdrawHistory"></ul>
 </div>
 
-<!-- Page 7: Profile -->
-<div class="card hidden" id="page7">
+<!-- Page 6: Profile -->
+<div id="page-profile" class="page">
 <h1>Profile</h1>
-<p>নাম: <span id="profileName"></span></p>
-<p>মোবাইল: <span id="profileMobile"></span></p>
-<p>Payment Method: <span id="profileMethod"></span></p>
-<p>Account: <span id="profileAcc"></span></p>
-<p>Registered: <span id="profileDate"></span></p>
-<button class="btn" onclick="editProfile()">Edit Profile</button>
+<p>Name: <span id="profName"></span></p>
+<p>Mobile: <span id="profMobile"></span></p>
+<p>Payment Method: <span id="profMethod"></span></p>
+<p>Account: <span id="profAcc"></span></p>
+<p>Registration Date: <span id="profDate"></span></p>
 </div>
 
-<!-- Bottom Navigation -->
-<div class="navbar">
-<button onclick="nav(2)" id="navHome" class="active">Home</button>
-<button onclick="nav(3)" id="navEarn">Earn</button>
-<button onclick="nav(4)" id="navTeam">Team</button>
-<button onclick="nav(5)" id="navWithdraw">Withdraw</button>
-<button onclick="nav(6)" id="navHistory">History</button>
-<button onclick="nav(7)" id="navProfile">Profile</button>
-</div>
-
-</div>
+<!-- Navigation -->
+<nav>
+<button onclick="showPage('page-home')">Home</button>
+<button onclick="showPage('page-register')">Register</button>
+<button onclick="showPage('page-team')">Team</button>
+<button onclick="showPage('page-withdraw')">Withdraw</button>
+<button onclick="showPage('page-history')">History</button>
+<button onclick="showPage('page-profile')">Profile</button>
+</nav>
 
 <script>
-// --- Variables ---
-let user = JSON.parse(localStorage.getItem("user")) || null;
-let balance = Number(localStorage.getItem("bal")) || 0;
-let adRunning = false;
-let refCode = localStorage.getItem("refCode") || ("BE"+Math.floor(Math.random()*100000));
-localStorage.setItem("refCode",refCode);
-let referrals = JSON.parse(localStorage.getItem("refList")||"[]");
-document.getElementById("bal").innerText = balance;
-
-// --- Registration ---
-function registerUser(){
-    let name = document.getElementById("regName").value.trim();
-    let mobile = document.getElementById("regMobile").value.trim();
-    let method = document.getElementById("regMethod").value;
-    let acc = document.getElementById("regAcc").value.trim();
-    if(!name || !mobile || !method || !acc){document.getElementById("regMsg").innerText="সব ফিল্ড পূরণ করুন"; return;}
-    if(user){document.getElementById("regMsg").innerText="এক মোবাইলে একটাই একাউন্ট allowed"; return;}
-    user = {name,mobile,method,acc,date:new Date().toLocaleDateString()};
-    localStorage.setItem("user",JSON.stringify(user));
-    showHome();
+// ----- Page Navigation -----
+function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(pageId).classList.add('active');
 }
 
-// --- Navigation ---
-function nav(page){
-    for(let i=2;i<=7;i++){
-        document.getElementById("page"+i).classList.add("hidden");
-        document.getElementById("nav"+["Home","Earn","Team","Withdraw","History","Profile"][i-2]).classList.remove("active");
-    }
-    document.getElementById("page"+page).classList.remove("hidden");
-    document.getElementById("nav"+["Home","Earn","Team","Withdraw","History","Profile"][page-2]).classList.add("active");
-    if(page==2) showHome();
-    if(page==3) renderCalendar();
-    if(page==4) showReferral();
-    if(page==6) showHistory();
-    if(page==7) showProfile();
+// ----- Registration -----
+document.getElementById('registerBtn').addEventListener('click',()=>{
+    let name = document.getElementById('regName').value;
+    let mobile = document.getElementById('regMobile').value;
+    let method = document.getElementById('regPayment').value;
+    let acc = document.getElementById('regAcc').value;
+    if(!name||!mobile||!acc){ alert('সব ফিল্ড পূরণ করো'); return; }
+    localStorage.setItem('userName',name);
+    localStorage.setItem('userMobile',mobile);
+    localStorage.setItem('userMethod',method);
+    localStorage.setItem('userAcc',acc);
+    localStorage.setItem('regDate',new Date().toLocaleDateString());
+    alert('Registration Complete!');
+    updateProfile();
+    showPage('page-home');
+});
+
+// ----- Profile Update -----
+function updateProfile(){
+    document.getElementById('profName').innerText = localStorage.getItem('userName') || '';
+    document.getElementById('profMobile').innerText = localStorage.getItem('userMobile') || '';
+    document.getElementById('profMethod').innerText = localStorage.getItem('userMethod') || '';
+    document.getElementById('profAcc').innerText = localStorage.getItem('userAcc') || '';
+    document.getElementById('profDate').innerText = localStorage.getItem('regDate') || '';
+    document.getElementById('payMethod').innerText = localStorage.getItem('userMethod') || '';
+    document.getElementById('payAcc').innerText = localStorage.getItem('userAcc') || '';
 }
 
-// --- Home Page ---
-function showHome(){
-    if(!user) return; page1.classList.add("hidden"); page2.classList.remove("hidden");
-    document.getElementById("userName").innerText = user.name;
-    document.getElementById("bal").innerText = balance;
-    document.getElementById("payMethod").innerText = user.method;
-    document.getElementById("payAcc").innerText = user.acc;
-}
+// ----- Earn Page -----
+const maxAdsPerDay = 100;
+const today = new Date().toISOString().slice(0,10);
+let adsToday = JSON.parse(localStorage.getItem("ads_" + today)) || 0;
+document.getElementById('adsCount').innerText = adsToday;
 
-// --- Earn Page ---
-function startAd(){
-    if(adRunning)return;
-    if(localStorage.getItem("adDone")==today()) return alert("আজকের Ad শেষ");
-    adRunning=true; let t=15; document.getElementById("timer").innerText="⏳ "+t+"s";
-    adBtn.disabled=true;
-    let interval=setInterval(()=>{
-        t--; document.getElementById("timer").innerText="⏳ "+t+"s";
-        if(t==0){clearInterval(interval); document.getElementById("timer").innerText=""; balance+=1; localStorage.setItem("bal",balance); localStorage.setItem("adDone",today()); alert("Ad Complete +1 টাকা"); adRunning=false; adBtn.disabled=false;}
+document.getElementById('goEarn').addEventListener('click',function(){
+    if(adsToday>=maxAdsPerDay){ alert("আজকের 100 এড limit শেষ!"); return;}
+    const adLink = "https://otieu.com/4/10476658"; // Monetag / SmartLink
+    window.open(adLink,"_blank");
+
+    // 15 sec timer
+    let timeLeft = 15;
+    const timerDiv = document.getElementById("timer");
+    timerDiv.innerText = "⏳ "+timeLeft+" সেকেন্ড অপেক্ষা করো...";
+    document.getElementById('goEarn').disabled = true;
+
+    const countdown = setInterval(()=>{
+        timeLeft--;
+        timerDiv.innerText = "⏳ "+timeLeft+" সেকেন্ড অপেক্ষা করো...";
+        if(timeLeft<=0){
+            clearInterval(countdown);
+            timerDiv.innerText="";
+            document.getElementById('goEarn').disabled=false;
+            adsToday++;
+            localStorage.setItem("ads_"+today,JSON.stringify(adsToday));
+            document.getElementById('adsCount').innerText=adsToday;
+            alert(`Ad complete! +1 টাকা balance-এ যোগ হয়েছে। আজকে ${adsToday}/100 এড দেখা হয়েছে।`);
+            // Update earn history
+            let earnHist = JSON.parse(localStorage.getItem('earnHistory')||'[]');
+            earnHist.push({date:new Date().toLocaleString(),amount:1});
+            localStorage.setItem('earnHistory',JSON.stringify(earnHist));
+        }
     },1000);
+});
+
+// ----- Team / Referral -----
+const referralCode = "USER123";
+document.getElementById('refLink').innerText=referralCode;
+function copyReferral(){ navigator.clipboard.writeText(referralCode); alert("Referral Copied!"); }
+// For demo: total referrals
+document.getElementById('totalRef').innerText=0;
+document.getElementById('refIncome').innerText=0;
+document.getElementById('gen1').innerText=0;
+document.getElementById('gen2').innerText=0;
+
+// ----- Withdraw Page -----
+document.getElementById('withdrawBtn').addEventListener('click',()=>{
+    let amount = Number(document.getElementById('withdrawAmount').value);
+    if(amount<130){ alert("Minimum withdraw 130 টাকা"); return; }
+    if(amount>1010){ alert("Maximum withdraw 1010 টাকা"); return; }
+    // For demo: simple cooldown 15 sec instead of 15 hr
+    let lastReq = Number(localStorage.getItem('lastWithdraw')||0);
+    let now = Date.now();
+    if(now - lastReq < 15000){ alert("কিছুক্ষণ পর আবার চেষ্টা করো"); return; }
+    localStorage.setItem('lastWithdraw',now);
+    // Save withdraw history
+    let wHist = JSON.parse(localStorage.getItem('withdrawHistory')||'[]');
+    wHist.push({date:new Date().toLocaleString(),amount:amount});
+    localStorage.setItem('withdrawHistory',JSON.stringify(wHist));
+    document.getElementById('withdrawMsg').innerText = "Withdraw Request Sent!";
+});
+
+// ----- History Page -----
+function updateHistory(){
+    let earnHist = JSON.parse(localStorage.getItem('earnHistory')||'[]');
+    let wHist = JSON.parse(localStorage.getItem('withdrawHistory')||'[]');
+    const eList = document.getElementById('earnHistory');
+    const wList = document.getElementById('withdrawHistory');
+    eList.innerHTML=""; wList.innerHTML="";
+    earnHist.forEach(e=>{ let li=document.createElement('li'); li.innerText=`${e.date} → ${e.amount} টাকা`; eList.appendChild(li);});
+    wHist.forEach(w=>{ let li=document.createElement('li'); li.innerText=`${w.date} → ${w.amount} টাকা`; wList.appendChild(li);});
 }
-function checkIn(){if(localStorage.getItem("checkin")==today()) return alert("আজকের Check-in নেওয়া হয়েছে"); balance+=2; localStorage.setItem("bal",balance); localStorage.setItem("checkin",today()); renderCalendar(); alert("Check-in +2 টাকা");}
-function dailyTask(){if(localStorage.getItem("task")==today()) return alert("আজকের Task শেষ"); balance+=10; localStorage.setItem("bal",balance); localStorage.setItem("task",today()); alert("Task +10 টাকা");}
 
-// --- Calendar ---
-function renderCalendar(){let d=new Date().getDate(); calendar.innerHTML=""; for(let i=1;i<=7;i++){let s=document.createElement("span"); s.innerText="Day "+i; if(i<=d%7)s.classList.add("checked"); calendar.appendChild(s);}}
-
-// --- Referral / Team ---
-function showReferral(){let box=document.getElementById("refBox"); let link=location.origin+location.pathname+"?ref="+refCode; box.innerHTML=`<b>🔗 Code:</b> ${refCode}<br><b>📎 Link:</b><br>${link}<br><b>Total Refer:</b> ${referrals.length}<br><b>1st Gen Commission:</b> ... <br><b>2nd Gen Commission:</b> ...<br><button class="copy-btn" onclick="copyLink('${link}')">Copy Link</button>`;}
-function copyLink(link){navigator.clipboard.writeText(link); alert("Referral link copied!");}
-
-// --- Withdraw ---
-function withdraw(){
-    let amt = Number(document.getElementById("withdrawAmt").value);
-    if(amt<130){alert("Minimum 130 required"); return;}
-    if(amt>balance){alert("Insufficient balance"); return;}
-    balance-=amt;
-    localStorage.setItem("bal",balance);
-    alert("Withdraw request sent! (24h processing)");
-    showHistory();
-}
-
-// --- History ---
-function showHistory(){document.getElementById("historyBox").innerHTML=`Balance: ${balance}<br>Ad, Task, Check-in & Referral history cards here`;}
-
-// --- Profile ---
-function showProfile(){document.getElementById("profileName").innerText=user.name; document.getElementById("profileMobile").innerText=user.mobile; document.getElementById("profileMethod").innerText=user.method; document.getElementById("profileAcc").innerText=user.acc; document.getElementById("profileDate").innerText=user.date;}
-function editProfile(){let newName=prompt("নতুন নাম লিখুন:",user.name); if(newName){user.name=newName; localStorage.setItem("user",JSON.stringify(user)); showProfile(); showHome();}}
-
-// --- Utility ---
-function today(){return new Date().toDateString();}
-
-// --- Initial Load ---
-if(user){page1.classList.add("hidden"); showHome();} else{page1.classList.remove("hidden");}
+// Call updateProfile & History on load
+updateProfile();
+updateHistory();
 </script>
+
 </body>
-                       </html>
+    </html>
